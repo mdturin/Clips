@@ -6,13 +6,15 @@ import { ModalComponent } from './modal/modal.component';
 import { TabComponent } from './tab/tab.component';
 import { TabsContainerComponent } from './tabs-container/tabs-container.component';
 import { NgxMaskModule } from 'ngx-mask';
+import { AlertComponent } from './alert/alert.component';
 
 @NgModule({
   declarations: [
     ModalComponent,
     TabsContainerComponent,
     TabComponent,
-    InputComponent
+    InputComponent,
+    AlertComponent
   ],
   imports: [
     CommonModule,
@@ -24,6 +26,7 @@ import { NgxMaskModule } from 'ngx-mask';
     TabsContainerComponent,
     TabComponent,
     InputComponent,
+    AlertComponent,
   ]
 })
 export class SharedModule { }
