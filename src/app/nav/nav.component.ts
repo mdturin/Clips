@@ -13,7 +13,8 @@ export class NavComponent {
   constructor(
     public modal: ModalService, 
     public afAuth: AngularFireAuth,
-    public auth: AuthService){}
+    public auth: AuthService
+  ){}
 
   openModal($event: Event){
     $event.preventDefault();

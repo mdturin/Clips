@@ -23,4 +23,7 @@
     <p *ngIf="control.errors?.['max']" class="text-red-400">
         Age too high.
     </p>
+    <p *ngIf="control.errors?.['noMatch']" class="text-red-400">
+        Password not match!
+    </p>
 </ng-container>
