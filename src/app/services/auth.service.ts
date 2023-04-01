@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
-import { delay, map, Observable } from 'rxjs';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { delay, filter, map, Observable, of, switchMap } from 'rxjs';
 import IUser from '../models/user.model';
 
 @Injectable({
@@ -9,28 +10,40 @@ import IUser from '../models/user.model';
 })
 export class AuthService {
 
+  private redirect = false;
   private users: AngularFirestoreCollection<IUser>;
   public isAuthenticated$: Observable<boolean> = new Observable<boolean>();
   public isAuthenticatedWithDelay$: Observable<boolean> = new Observable<boolean>();
 
   constructor(
-    private auth: AngularFireAuth, 
-    private db: AngularFirestore
+    private db: AngularFirestore,
+    private afAuth: AngularFireAuth,
+    private router: Router,
+    private route: ActivatedRoute
   ) { 
     this.users = db.collection('users');
-    this.isAuthenticated$ = auth.user.pipe(
+    this.isAuthenticated$ = afAuth.user.pipe(
       map((value) => value != null)
     );
     this.isAuthenticatedWithDelay$ = this.isAuthenticated$.pipe(
       delay(1000)
     );
+
+    this.router.events
+      .pipe(
+        filter(e => e instanceof NavigationEnd),
+        map(e => this.route.firstChild),
+        switchMap(route => route?.data ?? of({}))
+      ).subscribe(data => {
+        this.redirect = data?.['authOnly'] ?? false;
+      });
   }
 
   public async createUser(userData: IUser){
     if(!userData.email || !userData.password)
       throw new Error("Email/Password not provided!");
 
-    const userCred = await this.auth.createUserWithEmailAndPassword(
+    const userCred = await this.afAuth.createUserWithEmailAndPassword(
       userData.email as string,
       userData.password as string
     );
@@ -50,5 +63,12 @@ export class AuthService {
     await userCred.user.updateProfile({
       displayName: userData.name
     });
+  }
+
+  public async logout($event?: Event){
+    $event?.preventDefault();
+    await this.afAuth.signOut();
+    if(this.redirect)
+      await this.router.navigateByUrl('/');
   }
 }
