@@ -6,5 +6,9 @@ import { Component } from '@angular/core';
   styleUrls: ['./upload.component.css']
 })
 export class UploadComponent {
+  isDragOver = false;
 
+  storeFile($event: Event){
+    this.isDragOver = false;
+  }
 }
